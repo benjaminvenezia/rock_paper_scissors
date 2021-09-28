@@ -1,63 +1,123 @@
 
+const rock_btn = document.querySelector('.rock');
+const paper_btn = document.querySelector('.paper');
+const scissors_btn = document.querySelector('.scissor');
+const print_span = document.getElementById('print_lbl');
+const print_player = document.getElementById('player_lbl');
+const print_computer = document.getElementById('computer_lbl');
+const turn_lbl = document.getElementById('turn')
+const player_score = document.getElementById('player_score');
+const computer_score = document.getElementById('computer_score');
+const container_restart = document.querySelector('.container__restart');
+const container_choiceBtns = document.querySelector('.container__gameBtns');
+const restart_btn = document.getElementById('restart_btn');
+
 const FAIL = 0;
 const ROCK = 1;
 const PAPER = 2;
 const SCISSORS = 3;
 const COMPUTER_NAME = 'computer';
 const PLAYER_NAME = 'player';
+
+let computerPoints = 0;
+let playerPoints = 0;
+let userChoice = 0;
+let cpt = 0;
+
 const TURN_NB = 5;
-computerPoints = 0;
-playerPoints = 0;
 
+rock_btn.addEventListener("click", () => {
+    game(++cpt, 1);
+})
 
-//game boucle
-for(let i = 1; i <= TURN_NB; i++) {
-    game(i);
-}
+paper_btn.addEventListener("click", () => {
+    game(++cpt, 2);
 
+})
 
-function game(turn) {
-    
-    const computeurRandomChoice = Math.floor((Math.random() * 3)) + 1;
+scissors_btn.addEventListener("click", () => {
+    game(++cpt, 3);
 
-    let playerInput = prompt('Rock, Paper or Scissors?').toLocaleLowerCase().trim();
+})
 
-    if (playerInput !== null) {
-        let winner = getTheTurnWinner(getPlayerChoice(playerInput), computeurRandomChoice);
+restart_btn.addEventListener('click', () => {
+    restartGame();
+});
 
-        printTheWinner(winner, computeurRandomChoice, getPlayerChoice(playerInput));
+container_restart.style.display = "none";
 
-        incrementPoints(winner);
+function game(turn, userChoice) {
+  
+    if (turn <= TURN_NB) {
+        const computeurRandomChoice = Math.floor((Math.random() * 3)) + 1;
 
-        if(turn === TURN_NB) {
+        print_player.textContent = getChoiceFromInteger(userChoice);
+        print_computer.textContent = getChoiceFromInteger(computeurRandomChoice);
+
+        turn_lbl.textContent = turn;
+   
+        let winner = getTheTurnWinner(userChoice, computeurRandomChoice);
+
+        printTheWinner(winner, computeurRandomChoice, userChoice);
+
+        incrementPoints(winner, userChoice, computeurRandomChoice);
+
+        if (turn === TURN_NB) {
             printTheGameWinner();
         }
-        
-        console.log('turn : ', turn);
-        console.log('player :', playerPoints);
-        console.log('computer :', computerPoints);
     } 
 }
 
-/**
- * a function to manage 
- * @param {} winner 
- */
-function incrementPoints(winner) {
-    if(winner !== null) {
-        if(winner === COMPUTER_NAME) {
-            computerPoints++; 
+function restartGame() {
+    container_choiceBtns.style.display = "flex";
+    container_restart.style.display = "none";
+
+    const rock_btn = document.querySelector('.rock');
+    const paper_btn = document.querySelector('.paper');
+    const scissors_btn = document.querySelector('.scissor');
+
+    let cpt = 0;
+
+    rock_btn.addEventListener("click", () => {
+        game(++cpt, 1);
+    })
+
+    paper_btn.addEventListener("click", () => {
+        game(++cpt, 2);
+
+    })
+
+    scissors_btn.addEventListener("click", () => {
+        game(++cpt, 3);
+
+    })
+    turn = 0;
+    playerPoints = 0;
+    computerPoints = 0;
+    turn_lbl.textContent = 0;
+    computer_score.textContent = 0;
+    player_score.textContent = 0;
+    print_span.textContent = 'game restarted!';
+}
+
+
+
+function incrementPoints(winner, p, c) {
+    if(p !== c) {
+        if (winner === COMPUTER_NAME) {
+            computerPoints++;
         } else {
             playerPoints++;
         }
     }
+    
+    player_score.textContent =  playerPoints;
+    computer_score.textContent = computerPoints; 
 }
 
-function getTheTurnWinner (p, c) {
-    if ( p === c ) {
-        console.log('draw');
-        return null;
-    } else if ( p === PAPER && c === ROCK || p === ROCK && c === SCISSORS || p === SCISSORS && c === PAPER ) {
+function getTheTurnWinner(p, c) {
+
+    if (p === PAPER && c === ROCK || p === ROCK && c === SCISSORS || p === SCISSORS && c === PAPER) {
         return PLAYER_NAME;
     } else {
         return COMPUTER_NAME;
@@ -66,73 +126,39 @@ function getTheTurnWinner (p, c) {
 
 
 function printTheGameWinner() {
-    if(playerPoints > computerPoints) {
-        console.log(`${PLAYER_NAME} won this game with ${playerPoints} points. ${COMPUTER_NAME} loose this game with ${computerPoints} `);
-    } else if (playerPoints < computerPoints){
-        console.log(`${COMPUTER_NAME} won this game with ${computerPoints} points. ${PLAYER_NAME} loose this game with ${playerPoints} `);
+    container_restart.style.display = "flex";
+    container_choiceBtns.style.display = "none";
+
+    if (playerPoints > computerPoints) {
+        print_span.textContent = `${PLAYER_NAME} won this game with ${playerPoints} points. ${COMPUTER_NAME} loose this game with ${computerPoints} `;
+    } else if (playerPoints < computerPoints) {
+        print_span.textContent = `${COMPUTER_NAME} won this game with ${computerPoints} points. ${PLAYER_NAME} loose this game with ${playerPoints} `;
     } else {
-        console.log('No winner, it is a draw');
+        print_span.textContent = 'No winner, it is a draw';
     }
 }
 
 
 function printTheWinner(winner, c, p) {
-    if(winner !== null) {
-        if (winner === COMPUTER_NAME) {
-            console.log(`computer win the turn! ${getChoiceFromInteger(c)} won ${getChoiceFromInteger(p)}`) 
-        } else {
-            console.log(`player win the turn! ${getChoiceFromInteger(p)} won ${getChoiceFromInteger(c)}`);
-        } 
+    if (p === c) {
+        print_span.textContent = 'draw';
     }
+    else if (winner === COMPUTER_NAME) {
+        print_span.textContent = `computer win the turn! ${getChoiceFromInteger(c)} won ${getChoiceFromInteger(p)}`;
+    } else {
+        print_span.textContent = `player win the turn! ${getChoiceFromInteger(p)} won ${getChoiceFromInteger(c)}`;
+    }
+
 }
 
-/**
- * @param {*} n 
- * @returns 
- */
-function getChoiceFromInteger(n){
-    
+function getChoiceFromInteger(n) {
+
     const valueAttribution = {
         [FAIL]: 'an error occur',
         [ROCK]: 'rock',
         [PAPER]: 'paper',
         [SCISSORS]: 'scissors'
     }
+
     return valueAttribution[n];
-}
-
-/**
- * Convert the input from the user to an integer who represents the right objet of the game
- * @param {*} input 
- * @returns int
- */
-function getPlayerChoice(input) {
-    const rockWords = ['rock', 'r', 'rok', 'roc', 'pierre', 'stone', 'ston', 'ro', '1', 'rck', 'sto'];
-    const paperWords = ['paper', 'p', 'pap', 'sheet', '2', 'pa', 'poper', 'piper', 'psper'];
-    const scissorsWords = ['scissors', 'scissor', 'scisso', 'sissor', 'siso', 's', '3', 'sisccor', 'scis'];
-    let numberAction = FAIL;
-
-    rockWords.forEach(e => {
-        if(input === e) 
-          numberAction = ROCK;
-          return;
-    });
-
-    if(numberAction === FAIL) {
-        paperWords.forEach(e => {
-            if(input === e) 
-              numberAction = PAPER;
-              return;
-        });
-    }
-    
-    if(numberAction === FAIL) {
-        scissorsWords.forEach(e => {
-            if(input === e) 
-              numberAction = SCISSORS;
-              return;
-        });
-    }
-
-    return numberAction;
 }
